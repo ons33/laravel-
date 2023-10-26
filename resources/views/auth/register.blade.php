@@ -83,6 +83,18 @@
                     ?>
                 </div>
 
+                {{-- <div class="mt-4">
+                    <label for="role"
+                        class="block font-medium text-gray-700 dark:text-gray-300">{{ __('Role') }}</label>
+                    <input id="role"
+                        class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 focus:border-indigo-300 dark:focus:border-indigo-500 dark:bg-gray-900 text-gray-900 dark:text-gray-200"
+                        type="text" name="role" required>
+                </div> --}}
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <input type="text" name="role" id="role" class="form-control" value="{{ old('role') }}" required>
+                </div>
+
                 <div class="flex items-center justify-end mt-6">
                     <a class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                         href="{{ route('login') }}">

@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -28,24 +32,44 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $data): RedirectResponse
     {
-        $request->validate([
+        $data->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
+        // event(new Registered($user));
+        $data = $data->all(); // Retrieve all input data as an array
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => $data['role'],
         ]);
-
-        event(new Registered($user));
-
+    
+        // Assign the role based on the input field
+        $role = Role::firstOrCreate(['name' => $data['role']]);
+        $user->assignRole($role);
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        switch ($data['role']) {
+            case 'Formateur':
+                return redirect(RouteServiceProvider::HOME); // Adjust the route name
+                break;
+            case 'Recruteur':
+                return redirect()->route('OffreEmplois'); // Adjust the route name
+                break;
+            case 'Candidat':
+                return redirect()->route('offre.frontoffre'); // Adjust the route name
+                break;
+            case 'Participant':
+                return redirect(RouteServiceProvider::HOME); // Adjust the route name
+                break;
+            default:
+                return redirect(RouteServiceProvider::HOME);
+        }
+
+        
     }
 }
